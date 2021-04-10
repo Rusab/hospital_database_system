@@ -13,7 +13,8 @@ except:
 print("Connected")
 
 cur = con.cursor()
-cur.execute("INSERT INTO doctorsmanagement(Name, Expertise, Degree, Position, Chamber, Time, Fee, Contactno, id) VALUES ('Alu panda', 'Cardiology', 'MBBS', 'Dept Head', '2nd Floor', '12:24', 1200, '0192561582', 1);")
+cur.execute("INSERT INTO doctorsmanagement(Name, Expertise, Degree, Position, Chamber, Time, Fee, Contactno, id) VALUES ('Tushi panda', 'Nephrology', 'MBBS', 'Dept Head', '1st Floor', '12:24', 1200, '0132523582', 2);")
+con.commit()
 cur.execute("SELECT * FROM doctorsmanagement;")
 
 data = cur.fetchone()
