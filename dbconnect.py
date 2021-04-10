@@ -41,7 +41,7 @@ def insert_data(table_name, name, expertise, degree, position, chamber, time, fe
     con, cur = connect_db("HospitalDatabase")
     
     cur = con.cursor()
-    cur.execute("INSERT INTO doctorsmanagement (Name, Expertise, Degree, Position, Chamber, Time, Fee, Contactno, id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);", ( name, expertise, degree, position, chamber, time, fee, contactno, ids))
+    cur.execute("INSERT INTO {0} (Name, Expertise, Degree, Position, Chamber, Time, Fee, Contactno, id) VALUES ({1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9});".format(table_name, name, expertise, degree, position, chamber, time, fee, contactno, ids))
     con.commit()
     
 
@@ -50,15 +50,15 @@ def insert_data(table_name, name, expertise, degree, position, chamber, time, fe
     
 
 
-name = 'Uronto Panda'
-expertise = 'Cardiology'
-position = 'Professor'
-chamber = '1st Floor'
-degree = 'MBBS'
-time = '12:40'
+name = "'Uronto Godzila'"
+expertise = "'Cardiology'"
+position = "'Professor'"
+chamber = "'1st Floor'"
+degree = "'MBBS'"
+time = "'12:40'"
 fee = 2400
-contactno = '01521436142'
-ids = 1
+contactno = "'01521436142'"
+ids = 2
 
 
  
@@ -72,7 +72,7 @@ ids = 1
 # contactno = input("Phone number: ")
 # ids = 1
 
-#insert_data('doctorsmanagement', name, expertise, degree, position, chamber, time, fee, contactno, ids)
+insert_data('doctorsmanagement', name, expertise, degree, position, chamber, time, fee, contactno, ids)
 display_all('doctorsmanagement')
 
 
