@@ -22,6 +22,9 @@ def disconnect_db(con, cur):
     
     cur.close()
     con.close()    
+    
+def quote_str(text):
+    return "\"" + text + "\""
 
 def display_all(table_name):
     con, cur = connect_db("HospitalDatabase")
@@ -50,27 +53,27 @@ def insert_data(table_name, name, expertise, degree, position, chamber, time, fe
     
 
 
-name = "'Uronto Godzila'"
-expertise = "'Cardiology'"
-position = "'Professor'"
-chamber = "'1st Floor'"
-degree = "'MBBS'"
-time = "'12:40'"
-fee = 2400
-contactno = "'01521436142'"
-ids = 2
+# name = quote_str('Dragon We')
+# expertise = "'Cardiology'"
+# position = "'Professor'"
+# chamber = "'1st Floor'"
+# degree = "'MBBS'"
+# time = "'12:40'"
+# fee = 2400
+# contactno = "'01521436142'"
+# ids = 5
 
 
- 
-# name = input("Doctor Name: ")
-# expertise = input("Area of expertise: ")
-# position = input("Position: ")
-# chamber = input("Chamber Location: ")
-# degree = input("Degree: ")
-# time = input("Availble at: ")
-# fee = input("Fee: ")
-# contactno = input("Phone number: ")
-# ids = 1
+
+name = quote_str(input("Doctor Name: "))
+expertise = quote_str(input("Area of expertise: "))
+position = quote_str(input("Position: "))
+chamber = quote_str(input("Chamber Location: "))
+degree = quote_str(input("Degree: "))
+time = quote_str(input("Availble at: "))
+fee = input("Fee: ")
+contactno = quote_str( input("Phone number: "))
+ids = 1
 
 insert_data('doctorsmanagement', name, expertise, degree, position, chamber, time, fee, contactno, ids)
 display_all('doctorsmanagement')
