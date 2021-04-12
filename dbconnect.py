@@ -74,11 +74,25 @@ def delete_data(table_name, field_name, data):
     try:
         cur.execute("DELETE FROM {table} WHERE {field} = {data}".format(table = table_name, field = field_name, data=  data))       
         con.commit()
+        
     except:
         print("Data not found")
         
     disconnect_db(con, cur)
 
+def update_data(table_name, s_field_name, s_data, u_field_name, u_data):
+    con, cur = connect_db("HospitalDatabase")  
+    
+    try:
+        cur.execute("UPDATE {table} SET {s_field} = {s_data} WHERE {u_field} = {u_data};".format(table = table_name, s_field = field_name, s_data = data, u_field = u_field_name, u_data = u_data))
+        con.commit()
+        
+    except:
+        print("Couldn't update entry")    
+        
+    disconnect_db(con, cur)
+    
+    
 # name = quote_str('Dragon We')
 # expertise = "'Cardiology'"
 # position = "'Professor'"
@@ -92,7 +106,7 @@ def delete_data(table_name, field_name, data):
 
 table_fields = {'doctorsmanagement' : ["Doctor Name: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "id: "]}
 
-
+table_name = 'doctorsmanagement'
 
 
 
@@ -114,23 +128,40 @@ while(True):
         contactno = quote_str( input("Phone number: "))
         ids = 1
         
-        insert_data('doctorsmanagement', name, expertise, degree, position, chamber, time, fee, contactno, ids) 
+        insert_data(table_name, name, expertise, degree, position, chamber, time, fee, contactno, ids) 
         
     elif x == 2:
         print("Displaying all data: ")
         
-        display_all('doctorsmanagement') 
+        display_all(table_name) 
     
     elif x == 3:
         field_name = input("Choose a field: ")
         data = input("Enter data: ")
         
-        delete_data('doctorsmanagement', field_name, data)   
+        delete_data(table_name, field_name, data)   
         
     elif x == 4:
         field_name = input("Enter field: ")
         data = quote_str(input("Enter {field}: ".format(field = field_name)))
-        view_entry('doctorsmanagement', field_name, data)  
+        view_entry(table_name, field_name, data)  
+        
+    elif x == 5:
+        print("Search for a entry to make changes: ")
+        s_field_name = input("Enter field: ")
+        s_data = quote_str(input("Enter {field}: ".format(field = s_field_name))) 
+        
+        rep = 'Y'
+        
+        while(rep == 'Y'):    
+            
+            print("Enter the changes you want to make: ")
+            u_field_name = input("Enter field: ")
+            u_data = quote_str(input("Enter {field}: ".format(field = u_field_name)))      
+            
+            update_data(table_name, s_field_name, s_data, u_field_name, u_data)
+            
+            rep = input("Do you want to update more fields ? [Y/N]")
     
     else: 
         break
