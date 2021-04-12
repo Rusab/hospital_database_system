@@ -34,7 +34,7 @@ def quote_str(text):
 def display_all(table_name):
     con, cur = connect_db("HospitalDatabase")
    
-    cur.execute("SELECT * from {0};".format(table_name))
+    cur.execute("SELECT * from {0} WHERE is_deleted = 0;".format(table_name))
     
     data =cur.fetchall() 
     print(data)
@@ -111,6 +111,9 @@ def delete_data(table_name, field_name, data):
         
     disconnect_db(con, cur)
 
+    
+
+
 def update_data(table_name, s_field_name, s_data, u_field_name, u_data):
     con, cur = connect_db("HospitalDatabase")  
     
@@ -124,6 +127,9 @@ def update_data(table_name, s_field_name, s_data, u_field_name, u_data):
    
     disconnect_db(con, cur)
     
+
+def soft_delete(table_name, field_name, data):
+    update_data(table_name, field_name, data, "is_deleted", 1)
 
 
 
@@ -161,10 +167,18 @@ while(True):
         display_all(table_name) 
     
     elif x == 3:
+        3
         field_name = input("Choose a field: ")
-        data = input("Enter data: ")
-        
-        delete_data(table_name, field_name, data)   
+        data = quote_str(input("Enter data: "))
+    
+        d = int(input("1.Soft Delete\n2.Hard Delete\n"))
+    
+        if d == 2:             
+            delete_data(table_name, field_name, data)
+            
+        elif d == 1:
+            soft_delete(table_name, field_name, data)
+            
         
     elif x == 4:
         field_name = input("Enter field: ")
