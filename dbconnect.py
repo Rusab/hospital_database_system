@@ -63,11 +63,21 @@ def check_entry(table_name, field_name, data):
 
 
     
-def view_entry(table_name, field_name, data):    
+def view_entry(table_name, field_name, data, view_port):    
     con, cur = connect_db("HospitalDatabase")
     
+    cols = ""
+    firstField = True
+    
+    for col in view_port:
+        if firstField:
+            cols = cols + col
+            firstField = False
+        else:
+            cols = cols + ", " + col
+    
     try:
-        cur.execute("SELECT * from {table} WHERE {field} = {data};".format(table = table_name, field = field_name, data = data))
+        cur.execute("SELECT {cols} from {table} WHERE {field} = {data} AND is_deleted = 0;".format(cols = cols, table = table_name, field = field_name, data = data))
         row = cur.fetchone() 
         
         for (entry, field) in zip(row, table_fields[table_name]):
@@ -79,10 +89,10 @@ def view_entry(table_name, field_name, data):
         
     disconnect_db(con, cur)
 
-def insert_data(table_name, name, expertise, degree, position, chamber, time, fee, contactno):
+def insert_data(table_name, name, sex, expertise, degree, position, chamber, time, fee, contactno):
     con, cur = connect_db("HospitalDatabase")
     
-    cur.execute("INSERT INTO {0} (Name, Expertise, Degree, Position, Chamber, Time, Fee, Contactno) VALUES ({1}, {2}, {3}, {4}, {5}, {6}, {7}, {8});".format(table_name, name, expertise, degree, position, chamber, time, fee, contactno))
+    cur.execute("INSERT INTO {0} (Name, Sex, Expertise, Degree, Position, Chamber, Time, Fee, Contactno) VALUES ({1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9});".format(table_name, name, sex, expertise, degree, position, chamber, time, fee, contactno))
     con.commit()
     
 
@@ -117,7 +127,9 @@ def update_data(table_name, s_field_name, s_data, u_field_name, u_data):
 
 
 
-table_fields = {'doctorsmanagement' : ["Doctor Name: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "id: "]}
+table_fields = {'doctorsmanagement' : ["Doctor Name: ", "Sex: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "id: "]}
+
+view_ports = {'dview:doctorsmanagement': ["name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno"]}
 
 table_name = 'doctorsmanagement'
 
@@ -132,6 +144,7 @@ while(True):
     if x == 1:
         print("Enter the following data: \n")
         name = quote_str(input("Doctor Name: "))
+        sex = quote_str(input("Sex: "))
         expertise = quote_str(input("Area of expertise: "))
         position = quote_str(input("Position: "))
         chamber = quote_str(input("Chamber Location: "))
@@ -140,7 +153,7 @@ while(True):
         fee = input("Fee: ")
         contactno = quote_str( input("Phone number: "))
         
-        insert_data(table_name, name, expertise, degree, position, chamber, time, fee, contactno) 
+        insert_data(table_name, name, sex, expertise, degree, position, chamber, time, fee, contactno) 
         
     elif x == 2:
         print("Displaying all data: ")
@@ -156,7 +169,7 @@ while(True):
     elif x == 4:
         field_name = input("Enter field: ")
         data = quote_str(input("Enter {field}: ".format(field = field_name)))
-        view_entry(table_name, field_name, data)  
+        view_entry(table_name, field_name, data, view_ports['dview:doctorsmanagement'])  
         
     elif x == 5:
         print("Search for a entry to make changes: ")
