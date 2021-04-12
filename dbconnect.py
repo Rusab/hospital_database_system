@@ -14,12 +14,14 @@ def connect_db(db_name):
         cur = con.cursor()
         print("Connected") 
         
+        return con, cur
+        
     except:
         print("Can't Connect")
    
 
     
-    return con, cur
+
 
 def disconnect_db(con, cur):
     
@@ -39,6 +41,28 @@ def display_all(table_name):
     
     disconnect_db(con, cur)
     
+    
+    
+    
+def check_entry(table_name, field_name, data):    
+    con, cur = connect_db("HospitalDatabase")
+    
+    try:
+        cur.execute("SELECT * from {table} WHERE {field} = {data};".format(table = table_name, field = field_name, data = data))
+        data = cur.fetchall()
+        
+        if data:
+            return True
+        else:
+            return False
+    except:
+        return False
+    
+        
+    disconnect_db(con, cur)
+
+
+    
 def view_entry(table_name, field_name, data):    
     con, cur = connect_db("HospitalDatabase")
     
@@ -49,10 +73,6 @@ def view_entry(table_name, field_name, data):
         for (entry, field) in zip(row, table_fields[table_name]):
             print(field, entry)
 
-        # for field in table_fields[table_name] :
-        #     print(field)
-
-  
     except:
         print("Couldn't find entry")
     
@@ -85,7 +105,7 @@ def update_data(table_name, s_field_name, s_data, u_field_name, u_data):
     con, cur = connect_db("HospitalDatabase")  
     
     try:
-        cur.execute("UPDATE {table} SET {s_field} = {s_data} WHERE {u_field} = {u_data}".format(table = table_name, s_field = s_field_name, s_data = s_data, u_field = u_field_name, u_data = u_data))
+        cur.execute("UPDATE {table} SET {u_field} = {u_data} WHERE {s_field} = {s_data}".format(table = table_name, s_field = s_field_name, s_data = s_data, u_field = u_field_name, u_data = u_data))
         con.commit()
         print("Updated")
         
@@ -143,17 +163,21 @@ while(True):
         s_field_name = input("Enter field: ")
         s_data = quote_str(input("Enter {field}: ".format(field = s_field_name))) 
         
-        rep = 'Y'
+        if check_entry(table_name, s_field_name, s_data):
+            rep = 'Y'
         
-        while(rep == 'Y'):    
-            
-            print("Enter the changes you want to make: ")
-            u_field_name = input("Enter field: ")
-            u_data = quote_str(input("Enter {field}: ".format(field = u_field_name)))      
-            
-            update_data(table_name, s_field_name, s_data, u_field_name, u_data)
-            
-            rep = input("Do you want to update more fields ? [Y/N]")
+            while(rep == 'Y'):    
+                
+                print("Enter the changes you want to make: ")
+                u_field_name = input("Enter field: ")
+                u_data = quote_str(input("Enter {field}: ".format(field = u_field_name)))      
+                
+                update_data(table_name, s_field_name, s_data, u_field_name, u_data)
+                
+                rep = input("Do you want to update more fields ? [Y/N]")
+        
+        else:
+            print("No such entry found.")
     
     else: 
         break
