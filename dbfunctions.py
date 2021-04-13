@@ -6,6 +6,9 @@ Created on Tue Apr 13 03:10:16 2021
 """
 import MySQLdb
 
+
+
+
 def connect_db(db_name):
     try:
         con = MySQLdb.connect("localhost","root","", db_name)
@@ -35,7 +38,13 @@ def display_all(table_name):
     cur.execute("SELECT * from {0} WHERE is_deleted = 0;".format(table_name))
     
     data =cur.fetchall() 
-    print(data)
+    
+    
+    for row in data:
+        for col in row:
+            print(col)
+            
+    # print(data)
     
     disconnect_db(con, cur)
     
@@ -61,7 +70,7 @@ def check_entry(table_name, field_name, data):
 
 
     
-def view_entry(table_name, field_name, data, view_port):    
+def view_entry(table_name, field_name, data, view_port, field_names):    
     con, cur = connect_db("HospitalDatabase")
     
     cols = ""
@@ -78,7 +87,7 @@ def view_entry(table_name, field_name, data, view_port):
         cur.execute("SELECT {cols} from {table} WHERE {field} = {data} AND is_deleted = 0;".format(cols = cols, table = table_name, field = field_name, data = data))
         row = cur.fetchone() 
         
-        for (entry, field) in zip(row, table_fields[table_name]):
+        for (entry, field) in zip(row, field_names):
             print(field, entry)
 
     except:

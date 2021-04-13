@@ -8,8 +8,6 @@ Created on Sat Apr 10 13:48:23 2021
 
 import dbfunctions as db
 
-
-
 table_fields = {'doctorsmanagement' : ["Doctor Name: ", "Sex: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "id: "]}
 
 view_ports = {'dview:doctorsmanagement': ["name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno"]}
@@ -60,7 +58,7 @@ while(True):
     elif x == 4:
         field_name = input("Enter field: ")
         data = db.quote_str(input("Enter {field}: ".format(field = field_name)))
-        db.view_entry(table_name, field_name, data, view_ports['dview:doctorsmanagement'])  
+        db.view_entry(table_name, field_name, data, view_ports['dview:doctorsmanagement'], table_fields[table_name])  
         
     elif x == 5:
         print("Search for a entry to make changes: ")
