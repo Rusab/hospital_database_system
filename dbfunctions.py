@@ -6,9 +6,6 @@ Created on Tue Apr 13 03:10:16 2021
 """
 import MySQLdb
 
-
-
-
 def connect_db(db_name):
     try:
         con = MySQLdb.connect("localhost","root","", db_name)
@@ -21,8 +18,6 @@ def connect_db(db_name):
         print("Can't Connect")
    
 
-    
-
 
 def disconnect_db(con, cur):
     
@@ -31,6 +26,27 @@ def disconnect_db(con, cur):
     
 def quote_str(text):
     return "\"" + text + "\""
+
+def comma_join(text):
+    cols = ""
+    firstField = True
+    
+    for col in text:
+        if firstField:
+            cols = cols + col
+            firstField = False
+        else:
+            cols = cols + ", " + col
+    
+    return cols
+ 
+def list_make(*data):
+    data_list = list()
+    for col in data:
+        data_list.append(col)
+    
+    return data_list
+   
 
 def display_all(table_name):
     con, cur = connect_db("HospitalDatabase")
@@ -49,7 +65,7 @@ def display_all(table_name):
     disconnect_db(con, cur)
     
     
-    
+# def display_multiple()
     
 def check_entry(table_name, field_name, data):    
     con, cur = connect_db("HospitalDatabase")
@@ -73,37 +89,47 @@ def check_entry(table_name, field_name, data):
 def view_entry(table_name, field_name, data, view_port, field_names):    
     con, cur = connect_db("HospitalDatabase")
     
-    cols = ""
-    firstField = True
-    
-    for col in view_port:
-        if firstField:
-            cols = cols + col
-            firstField = False
-        else:
-            cols = cols + ", " + col
+    #string of columns to select
+    cols = comma_join(view_port)
     
     try:
         cur.execute("SELECT {cols} from {table} WHERE {field} = {data} AND is_deleted = 0;".format(cols = cols, table = table_name, field = field_name, data = data))
+        
+    
         row = cur.fetchone() 
         
-        for (entry, field) in zip(row, field_names):
-            print(field, entry)
-
+        data =cur.fetchall() 
+        
+        #check if one or more columns have been selected
+        if len(data) > len(row):    
+            for row in data:
+                for col in row:
+                    print(col)
+        
+        else:
+            for (entry, field) in zip(row, field_names):
+                print(field, entry)
+        
     except:
         print("Couldn't find entry")
     
         
     disconnect_db(con, cur)
 
-def insert_data(table_name, name, sex, expertise, degree, position, chamber, time, fee, contactno):
+def insert_data(table_name, fields_inserted, field_data):
     con, cur = connect_db("HospitalDatabase")
+
+    fields = comma_join(fields_inserted)
+    data = comma_join(field_data)
     
-    cur.execute("INSERT INTO {0} (Name, Sex, Expertise, Degree, Position, Chamber, Time, Fee, Contactno) VALUES ({1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9});".format(table_name, name, sex, expertise, degree, position, chamber, time, fee, contactno))
+    print("INSERT INTO {table} ({fields}) VALUES ({data});".format(table = table_name, fields = fields, data = data))
+    cur.execute("INSERT INTO {table} ({fields}) VALUES ({data});".format(table = table_name, fields = fields, data = data))
     con.commit()
     
 
     disconnect_db(con, cur)
+    
+    
     
 def delete_data(table_name, field_name, data):
     con, cur = connect_db("HospitalDatabase")
@@ -118,7 +144,6 @@ def delete_data(table_name, field_name, data):
         
     disconnect_db(con, cur)
 
-    
 
 
 def update_data(table_name, s_field_name, s_data, u_field_name, u_data):

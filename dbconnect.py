@@ -8,9 +8,11 @@ Created on Sat Apr 10 13:48:23 2021
 
 import dbfunctions as db
 
-table_fields = {'doctorsmanagement' : ["Doctor Name: ", "Sex: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "id: "]}
+table_fields = {'doctorsmanagement' : ["Doctor id: ", "Doctor Name: ", "Sex: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "Email: "]}
 
-view_ports = {'dview:doctorsmanagement': ["name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno"]}
+view_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"]}
+
+insert_scope = {'dview:doctorsmanagement': ["name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"]}
 
 table_name = 'doctorsmanagement'
 
@@ -23,6 +25,8 @@ while(True):
     x = int(input())
     
     if x == 1:
+        
+        
         print("Enter the following data: \n")
         name = db.quote_str(input("Doctor Name: "))
         sex = db.quote_str(input("Sex: "))
@@ -33,8 +37,11 @@ while(True):
         time = db.quote_str(input("Availble at: "))
         fee = input("Fee: ")
         contactno = db.quote_str( input("Phone number: "))
+        email = db.quote_str(input("Email: "))
         
-        db.insert_data(table_name, name, sex, expertise, degree, position, chamber, time, fee, contactno) 
+        data = db.list_make(name, sex, expertise, position, chamber, degree, time, fee, contactno, email)
+        
+        db.insert_data(table_name, insert_scope['dview:doctorsmanagement'], data ) 
         
     elif x == 2:
         print("Displaying all data: ")
