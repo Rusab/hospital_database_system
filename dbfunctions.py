@@ -16,7 +16,6 @@ def connect_db(db_name):
         
     except:
         print("Can't Connect")
-   
 
 
 def disconnect_db(con, cur):
@@ -39,7 +38,14 @@ def comma_join(text):
             cols = cols + ", " + col
     
     return cols
- 
+
+def date_process(text):
+    d = text.split("-")
+    if len(d) == 3:
+        return d[2] + "-" + d[1] + "-"+ d[0]
+    else:
+        raise Exception("Wrong Format")
+        
 def list_make(*data):
     data_list = list()
     for col in data:
@@ -47,6 +53,15 @@ def list_make(*data):
     
     return data_list
    
+def choice_make(*choices):
+    i = 1
+    prompt = ""
+    
+    for choice in choices:
+        prompt = prompt + str(i) + ". " + choice + "\n"
+        i = i + 1
+    
+    return int(input(prompt))    
 
 def display_all(table_name):
     con, cur = connect_db("HospitalDatabase")
@@ -122,7 +137,6 @@ def insert_data(table_name, fields_inserted, field_data):
     fields = comma_join(fields_inserted)
     data = comma_join(field_data)
     
-    print("INSERT INTO {table} ({fields}) VALUES ({data});".format(table = table_name, fields = fields, data = data))
     cur.execute("INSERT INTO {table} ({fields}) VALUES ({data});".format(table = table_name, fields = fields, data = data))
     con.commit()
     
