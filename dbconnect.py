@@ -129,7 +129,6 @@ while(True):
                 db.display_all(table_name) 
             
             elif x == 3:
-                3
                 field_name = input("Choose a field: ")
                 data = db.quote_str(input("Enter data: "))
             
@@ -141,12 +140,21 @@ while(True):
                 elif d == 1:
                     db.soft_delete(table_name, field_name, data)
                     
-                
+                #View Entries
             elif x == 4:
-                field_name = input("Enter field: ")
-                data = db.quote_str(input("Enter {field}: ".format(field = field_name)))
-                db.view_entry(table_name, field_name, data, view_ports['dview:doctorsmanagement'], table_fields[table_name])  
+                p = db.choice_make("Doctor Infromation", "Patient information", "Staff Infromation", "Medical Supplies & Diagnostics", "Room", "Back")
                 
+                if p == 1:
+                    p = db.choice_make("Single Entry", "Multiple Entries")
+                    if p == 1:
+                        dsub.doctor_view_admin()
+                    elif p == 2:
+                        dsub.doctor_range_admin()
+                        
+                        
+                    
+                    
+                    
             elif x == 5:
                 print("Search for a entry to make changes: ")
                 s_field_name = input("Enter field: ")

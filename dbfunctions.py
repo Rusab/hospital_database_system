@@ -63,6 +63,18 @@ def choice_make(*choices):
     
     return int(input(prompt))    
 
+def select_make(choices):
+    i = 1
+    prompt = ""
+    
+    for choice in choices:
+        prompt = prompt + str(i) + ". " + choice + "\n"
+        i = i + 1
+    
+    return int(input(prompt))    
+
+
+
 def display_all(table_name):
     con, cur = connect_db("HospitalDatabase")
    
@@ -104,11 +116,18 @@ def check_entry(table_name, field_name, data):
 def view_entry(table_name, field_name, data, view_port, field_names):    
     con, cur = connect_db("HospitalDatabase")
     
+    keyword = ""
+    for (name, dat) in zip(field_name, data):
+        keyword = keyword + name + " = " + dat + " AND "
+        
+        
+    
     #string of columns to select
     cols = comma_join(view_port)
     
+
     try:
-        cur.execute("SELECT {cols} from {table} WHERE {field} = {data} AND is_deleted = 0;".format(cols = cols, table = table_name, field = field_name, data = data))
+        cur.execute("SELECT {cols} from {table} WHERE {keyword} is_deleted = 0;".format(cols = cols, table = table_name, keyword = keyword))
         
     
         row = cur.fetchone() 
@@ -130,6 +149,58 @@ def view_entry(table_name, field_name, data, view_port, field_names):
     
         
     disconnect_db(con, cur)
+    
+    
+def view_range(table_name, field_name, data_range, view_port, field_names, inequality):    
+    con, cur = connect_db("HospitalDatabase")
+    
+    
+    
+    keyword = ""
+    for (name, dat, inequal) in zip(field_name, data_range, inequality):
+        keyword = keyword + name + inequal + dat + " AND "
+        
+        
+    
+    #string of columns to select
+    cols = comma_join(view_port)
+    
+    print("SELECT {cols} from {table} WHERE {keyword} is_deleted = 0;".format(cols = cols, table = table_name, keyword = keyword))
+
+    try:
+        cur.execute("SELECT {cols} from {table} WHERE {keyword} is_deleted = 0;".format(cols = cols, table = table_name, keyword = keyword))
+        
+    
+        row = cur.fetchone() 
+        cur.execute("SELECT {cols} from {table} WHERE {keyword} is_deleted = 0;".format(cols = cols, table = table_name, keyword = keyword))     
+        data =cur.fetchall() 
+        
+        # print("all: ")
+        # print(data)
+        
+        # print("row: ")
+        # print(row)
+        
+        #check if one or more columns have been selected
+        if len(data) <= len(row):    
+            for row in data:
+                for (entry, field) in zip(row, field_names):
+                    print(field, entry)
+                print("\n")
+        
+        
+        else:
+            for (entry, field) in zip(row, field_names):
+                print(field, entry)
+        
+    except:
+        print("Couldn't find entry")
+    
+        
+    disconnect_db(con, cur)    
+
+
+
 
 def insert_data(table_name, fields_inserted, field_data):
     con, cur = connect_db("HospitalDatabase")

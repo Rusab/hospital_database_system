@@ -30,6 +30,8 @@ room = ["Ward", "Cabin", "Emergency", "Outdoor", "ICU", "OT"]
 
 table_name = 'doctorsmanagement'
 
+
+
 def doctor_entry():
     table_name = 'doctorsmanagement'
     print("Enter the following data: \n")
@@ -213,6 +215,53 @@ def room_entry():
     db.insert_data(table_name, insert_scope['room'], data)
         
     
+def doctor_view_admin():
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another == "Y"):
+        print("Enter field: \n")
+        f_no = db.select_make(view_ports['dview:doctorsmanagement'])
+        
+        field_array.append(view_ports['dview:doctorsmanagement'][f_no - 1])
+        
+        data = db.quote_str(input("Enter {field}: ".format(field = view_ports['dview:doctorsmanagement'][f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+    db.view_entry(table_name, field_array, data_array, view_ports['dview:doctorsmanagement'], table_fields[table_name])  
+    
+def doctor_range_admin():
+    another = "Y"
+    field_array = []
+    data_array = []
+    inequality_array =[]
+    
+    while(another == "Y"):
+        print("Enter field: \n")
+        f_no = db.select_make(view_ports['dview:doctorsmanagement'])
+        
+        field_array.append(view_ports['dview:doctorsmanagement'][f_no - 1])
+        
+        data_lesser = db.quote_str(input("{field} > ".format(field = view_ports['dview:doctorsmanagement'][f_no - 1])))
+                
+        if len(data_lesser) != 0:
+            data_array.append(data_lesser)
+            inequality_array.append(" > ")
+        
+        data_greater = db.quote_str(input("{field} < ".format(field = view_ports['dview:doctorsmanagement'][f_no - 1])))
+        if len(data_greater) != 0:
+            data_array.append(data_greater)
+            inequality_array.append(" < ")
+    
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+    db.view_range(table_name, field_array, data_array, view_ports['dview:doctorsmanagement'], table_fields[table_name], inequality_array)  
     
     
 
