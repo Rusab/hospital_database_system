@@ -166,26 +166,65 @@ while(True):
                                 p = db.choice_make("Patient: Outdoor", "Patient: Emergency", "Patient : Admission", "Back")
                                 if p == 1:
                                     p = db.choice_make("Search with value", "Search with range", "Back")
+                                    delete_check = ['outdoor', 'patientmanagement', 'doctorsmanagement']
+                                    combo = [ ["outdoor", 'patientmanagement', "patientid"], ["outdoor", "doctorsmanagement", "docid"]]
+                                    
                                     if p == 1:
-                                        dsub.outdoor_view_admin()
+                                        dsub.generic_view_value(dsub.select_ports['outdoor:admin'], dsub.view_ports['admin:outdoor'], dsub.table_fields['admin:outdoor'], delete_check, combo, "date", "date")
+                                        
                                     elif p == 2:
-                                        dsub.outdoor_range_admin()
+                                        dsub.generic_view_range(dsub.select_ports['outdoor:admin'], dsub.view_ports['admin:outdoor'], dsub.table_fields['admin:outdoor'], delete_check, combo, "date", "date")
                                 
                                 elif p == 2:
                                     p = db.choice_make("Search with value", "Search with range", "Back")
+                                    delete_check = ['emergency', 'patientmanagement', 'doctorsmanagement']
+                                    combo = [ ["emergency", 'patientmanagement', "patientid"], ["emergency", "doctorsmanagement", "docid"]]
+                                    
                                     if p == 1:
-                                        dsub.emergency_view_admin()
+                                        dsub.generic_view_value(dsub.select_ports['emergency:admin'], dsub.view_ports['admin:emergency'], dsub.table_fields['admin:emergency'], delete_check, combo, "date", "date")
+                                        
                                     elif p == 2:
-                                        dsub.emergency_range_admin()
+                                        dsub.generic_view_range(dsub.select_ports['emergency:admin'], dsub.view_ports['admin:emergency'], dsub.table_fields['admin:emergency'], delete_check, combo, "date", "date")
                                 
                                 elif p == 3:
                                     p = db.choice_make("Search with value", "Search with range", "Back")
+                                    delete_check = ['admission', 'patientmanagement', 'doctorsmanagement']
+                                    combo = [ ["admission", 'patientmanagement', "patientid"], ["admission", "doctorsmanagement", "docid"], ["admission", "room", "roomid"]]
                                     if p == 1:
-                                        dsub.admission_view_admin()
+                                        
+                                        dsub.generic_view_value(dsub.select_ports['admission:admin'], dsub.view_ports['admin:admission'], dsub.table_fields['admin:admission'], delete_check, combo, "admissiondate", "releasedate")
                                     elif p == 2:
-                                        dsub.admission_range_admin() 
-                                else:
-                                    break
+                                        dsub.generic_view_range(dsub.select_ports['admission:admin'], dsub.view_ports['admin:admission'], dsub.table_fields['admin:admission'], delete_check, combo, "admissiondate", "releasedate")
+                                    
+                            elif p == 3:
+                                p = db.choice_make("Search with value", "Search with range", "Back")
+                                delete_check = ['prescription', 'patientmanagement', 'doctorsmanagement']
+                                combo = [ ["prescription", 'patientmanagement', "patientid"], ["prescription", "doctorsmanagement", "docid"], ["prescription", "medicine", "medid"], ["prescription", "diagnostictests", "testid"]]
+                               
+                                if p == 1:
+                                    dsub.generic_view_value(dsub.select_ports['admin:prescription'], dsub.view_ports['admin:prescription'], dsub.table_fields['admin:prescription'], delete_check, combo, "date", "date") 
+                                
+                                if p == 2:
+                                    dsub.generic_view_range(dsub.select_ports['admin:prescription'], dsub.view_ports['admin:prescription'], dsub.table_fields['admin:prescription'], delete_check, combo, "date", "date")    
+                            
+                            elif p == 4:
+                                p = db.choice_make("Search with value", "Search with range", "Back")
+                                delete_check = ['prescription', 'patientmanagement', 'diagnosticreport']
+                                combo =  [ ["prescription", "diagnosticreport", "presid"], ["prescription", 'patientmanagement', "patientid"],  ["prescription", "diagnostictests", "testid"], ["diagnosticreport", "doctorsmanagement", "docid"]]
+                               
+                                if p == 1:
+                                    dsub.generic_view_value(dsub.select_ports['admin:report'], dsub.view_ports['admin:report'], dsub.table_fields['admin:report'], delete_check, combo, "date", "date") 
+                                
+                                if p == 2:
+                                    dsub.generic_view_range(dsub.select_ports['admin:report'], dsub.view_ports['admin:report'], dsub.table_fields['admin:report'], delete_check, combo, "date", "date")    
+                            
+
+                            else:
+                                break
+                            
+                    elif p == 3:
+                        while(True):
+                             p = db.choice_make("Staff Information", "Duty Schedule", "Back")
                     
                             
             elif x == 5:

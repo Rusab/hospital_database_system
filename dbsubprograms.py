@@ -14,7 +14,9 @@ table_fields = {'doctorsmanagement' : ["Doctor id: ", "Doctor Name: ", "Sex: ", 
                 'admin:last-rep': ["Prescription No: ", "Test Name: ", "Report Summary: ", "Date: ", "Time: ", "Report prepared by: ", "Department: "],
                 'admin:outdoor': ["Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Contact No: ", "Visit Date: ", "Visit Time: ", "Duty Doctor: ","Doctor ID: ", "Department: "],
                 'admin:emergency': ["Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Contact No: ", "Visit Date: ", "Visit Time: ", "Duty Doctor: ","Doctor ID: ", "Department: "],
-                'admin:admission': ["Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Contact No: ", "Admission Status: ", "Admission Date: ", "Admission Time: ", "Room No: ", "Room Type: ", "Bed No: ", "Release Date: ", "Release Time: ", "Admitted Under: ","Doctor ID: ", "Department of "]}
+                'admin:admission': ["Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Contact No: ", "Admission Status: ", "Admission Date: ", "Admission Time: ", "Room No: ", "Room Type: ", "Bed No: ", "Release Date: ", "Release Time: ", "Admitted Under: ","Doctor ID: ", "Department of "],
+                'admin:prescription': ["Prescription No: ", "Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Date: ", "Time: ", "Diagnosis: ", "Prescribed Medicine: ", "Prescribed Tests: ","Prescribed By: ", "Doctor ID: ", "Department of "],
+                'admin:report': ["Prescription No: ", "Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Test Name: ", "Report Summary: ", "Date: ", "Time: ", "Report prepared by: ", "Department: "]}
 
 view_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"],
               'admin:patientmanagement': ["patientid","name", "sex", "age", "bloodgroup", "medicalhistory", "address",  "contactno", "email"],
@@ -22,7 +24,9 @@ view_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "
               'admin:last-rep': ["prescription.presid", "diagnostictests.name", "diagnosticreport.report", "diagnosticreport.date", "diagnosticreport.time", "doctorsmanagement.name", "doctorsmanagement.expertise"],
               'admin:outdoor': ["patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup", "patientmanagement.contactno", "outdoor.date", "outdoor.time", "doctorsmanagement.name","doctorsmanagement.docid", "doctorsmanagement.expertise"],
               'admin:emergency': ["patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup", "patientmanagement.contactno", "emergency.date", "emergency.time", "doctorsmanagement.name","doctorsmanagement.docid", "doctorsmanagement.expertise"],
-              'admin:admission': ["patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup", "patientmanagement.contactno", "admission.admissionstat", "admission.admissiondate", "admission.admissiontime", "room.roomid", "room.roomtype", "admission.bedno",  "admission.releasedate",  "admission.releasetime", "doctorsmanagement.name","doctorsmanagement.docid", "doctorsmanagement.expertise"]}
+              'admin:admission': ["patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup", "patientmanagement.contactno", "admission.admissionstat", "admission.admissiondate", "admission.admissiontime", "room.roomid", "room.roomtype", "admission.bedno",  "admission.releasedate",  "admission.releasetime", "doctorsmanagement.name","doctorsmanagement.docid", "doctorsmanagement.expertise"],
+              'admin:prescription': ["prescription.presid", "patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup",  "prescription.date", "prescription.time", "prescription.diagnosis", "medicine.brandname", "diagnostictests.name", "doctorsmanagement.name", "doctorsmanagement.docid", "doctorsmanagement.expertise"],
+              'admin:report': ["prescription.presid", "patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup", "diagnostictests.name", "diagnosticreport.report", "diagnosticreport.date", "diagnosticreport.time", "doctorsmanagement.name", "doctorsmanagement.expertise"]}
 
 select_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"],
                 'drange:doctorsmanagement': ["docid", "name", "fee"],
@@ -30,7 +34,9 @@ select_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise",
                 'drange:patientmanagement': ["patientid", "name", "age"],
                 'outdoor:admin': ["patientid", "docid", "date"],
                 'emergency:admin': ["patientid", "docid", "date"],
-                'admission:admin': ["patientid", "docid", "admissiondate", "releasedate", "admissionstat"]}
+                'admission:admin': ["patientid", "docid", "admissiondate", "releasedate", "admissionstat"],
+                'admin:prescription': ["presid", "patientid", "docid", "date"],
+                'admin:report': ["presid", "patientid", "docid", "date"]}
 
 
 insert_scope = {'dview:doctorsmanagement': ["name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"], 
@@ -536,6 +542,7 @@ def admission_view_admin():
     combo = [ ["admission", 'patientmanagement', "patientid"], ["admission", "doctorsmanagement", "docid"], ["admission", "room", "roomid"]]
     db.view_entry(delete_check, field_array, data_array, view_ports['admin:admission'], table_fields['admin:admission'], combo)
     
+    
 def admission_range_admin():
 
     another = "Y"
@@ -578,6 +585,96 @@ def admission_range_admin():
     delete_check = ['admission', 'patientmanagement', 'doctorsmanagement']
     combo = [ ["admission", 'patientmanagement', "patientid"], ["admission", "doctorsmanagement", "docid"], ["admission", "room", "roomid"]]
     db.view_range(delete_check, field_array, data_array, view_ports['admin:admission'], table_fields['admin:admission'], inequality_array, combo)
+    
+    
+def generic_view_value(select_ports, view_ports, table_fields, delete_check, combo, datefield1="", datefield2=""):
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports)
+        
+        field_name =  select_ports[f_no - 1]
+        
+        field_array.append(field_name)
+        
+        if field_name == datefield1 or field_name == datefield2:
+           data = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY): ")))
+        
+        else:
+            data = db.quote_str(input("Enter {field}: ".format(field = select_ports[f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+    db.view_entry(delete_check, field_array, data_array, view_ports, table_fields, combo)
+    
+    
+def generic_view_range(select_ports, view_ports, table_fields, delete_check, combo, datefield1="", datefield2=""):
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    inequality_array =[]
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports)
+        
+        field_name =  select_ports[f_no - 1]
+        
+        if field_name == datefield1 or field_name == datefield2:
+           data_lesser = db.quote_str(db.date_process(input("Date(DD-MM-YYYY) > ")))
+        
+        else:        
+            data_lesser = db.quote_str(input("{field} > ".format(field = field_name)))
+                
+        if data_lesser != '""' :
+            data_array.append(data_lesser)
+            field_array.append(field_name)
+            inequality_array.append(" > ")
+            
+        if field_name == datefield1 or field_name == datefield2:
+         data_greater = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY) < ")))
+        
+        else:      
+            data_greater = db.quote_str(input("{field} < ".format(field = field_name)))
+        
+        if data_greater != '""' :
+            data_array.append(data_greater)
+            field_array.append(field_name)
+            inequality_array.append(" < ")
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+    db.view_range(delete_check, field_array, data_array, view_ports, table_fields, inequality_array, combo)
+
+def generic_view_singletable(select_ports, view_ports, table_fields, table):
+    table_name = [table]
+    
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports)
+        
+        field_name =  select_ports[f_no - 1]
+        
+        field_array.append(field_name)
+        
+        data = db.quote_str(input("Enter {field}: ".format(field = select_ports[f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+    db.view_entry(table_name, field_array, data_array ,select_ports, table_fields)  
 
 
 
