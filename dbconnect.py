@@ -142,15 +142,20 @@ while(True):
                     
                 #View Entries
             elif x == 4:
-                p = db.choice_make("Doctor Infromation", "Patient information", "Staff Infromation", "Medical Supplies & Diagnostics", "Room", "Back")
-                
-                if p == 1:
-                    p = db.choice_make("Single Entry", "Multiple Entries")
+                while(True):
+                    p = db.choice_make("Doctor Infromation", "Patient information", "Staff Infromation", "Medical Supplies & Diagnostics", "Room", "Back")
+                    
                     if p == 1:
-                        dsub.doctor_view_admin()
+                        p = db.choice_make("Single Entry", "Multiple Entries")
+                        if p == 1:
+                            dsub.doctor_view_admin()
+                        elif p == 2:
+                            dsub.doctor_range_admin()
+                            
                     elif p == 2:
-                        dsub.doctor_range_admin()
+                        dsub.patient_view_admin()
                         
+                            
                         
                     
                     

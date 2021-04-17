@@ -8,9 +8,19 @@ Created on Thu Apr 15 16:24:14 2021
 
 import dbfunctions as db
 
-table_fields = {'doctorsmanagement' : ["Doctor id: ", "Doctor Name: ", "Sex: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "Email: "]}
+table_fields = {'doctorsmanagement' : ["Doctor id: ", "Doctor Name: ", "Sex: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "Email: "],
+                'patientmanagement': ["Patient ID: ", "Patient Name: ", "Sex: ", 'Age: ', 'Bloodgroup: ', "Medical History: ", "Address: ", "Contact No: ", "Email: "],
+                'admin:last-pres': ["Prescription No: ", "Diagnosis: ", "Date: ", "Time: ", "Prescribed Medicine: ", "Prescribed Tests: ","Prescribed By: ", "Department: "],
+                'admin:last-rep': ["Prescription No: ", "Test Name: ", "Report Summary: ", "Date: ", "Time: ", "Report prepared by: ", "Department: "]}
 
-view_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"]}
+view_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"],
+              'admin:patientmanagement': ["patientid","name", "sex", "age", "bloodgroup", "medicalhistory", "address",  "contactno", "email"],
+              'admin:last-pres': ["prescription.presid", "prescription.diagnosis", "prescription.date", "prescription.time", "medicine.brandname", "diagnostictests.name","doctorsmanagement.name", "doctorsmanagement.expertise"],
+              'admin:last-rep': ["prescription.presid", "diagnostictests.name", "diagnosticreport.report", "diagnosticreport.date", "diagnosticreport.time", "doctorsmanagement.name", "doctorsmanagement.expertise"]}
+
+select_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"],
+                'admin:patientmanagement': ["patientid", "name", "sex", "bloodgroup", "contactno", "email"]}
+
 
 insert_scope = {'dview:doctorsmanagement': ["name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"], 
                 'admin-doc:roomduty': ["docid", "roomid", "date", "time"],
@@ -19,7 +29,7 @@ insert_scope = {'dview:doctorsmanagement': ["name", "sex", "expertise", "degree"
                 'patinet:outdoor-emergency': ["patientid", "docid", "date", "time"],
                 'admin:admission': ["patientid", "admissionstat","roomid", "bedno", "docid",  "admissiondate", "admissiontime", "releasedate", "releasetime"],
                 'admin:prescription': ["patientid", "docid", "diagnosis", "medid", "testid", "date", "time"],
-                'admin:report': ["patientid", "docid", "testid", "date", "time", "report"],
+                'admin:report': ["presid", "docid", "date", "time", "report"],
                 'admin:staffmanagemnet': ["name", "sex", "age", "position", "contactno", "email", "salary"],
                 'medicine':["brandname", "genericname", "manufecturer", "literature", "stock"],
                 'medequipment': ["name", "stock"],
@@ -133,14 +143,13 @@ def prescription():
     
 def reports():
     table_name = 'diagnosticreport'
-    patid = input("Enter Patient ID: ")
+    presid = input("Enter Prescription ID: ")
     docid = input("Enter Doctor ID: ")
-    testid = input("Enter Test ID: ")
     date = db.quote_str(db.date_process(input("Enter Date (DD-MM-YYYY): ")))
     time = db.quote_str(input("Enter time: "))
     report = db.quote_str(input("Report: "))
     
-    data = db.list_make(patid, docid, testid, date, time, report)
+    data = db.list_make(presid, docid, date, time, report)
     
     db.insert_data(table_name, insert_scope['admin:report'], data)     
     
@@ -216,25 +225,32 @@ def room_entry():
         
     
 def doctor_view_admin():
+    table_name = ['doctorsmanagement']
+    
     another = "Y"
     field_array = []
     data_array = []
     while(another == "Y"):
         print("Enter field: \n")
-        f_no = db.select_make(view_ports['dview:doctorsmanagement'])
+        f_no = db.select_make(select_ports['dview:doctorsmanagement'])
         
-        field_array.append(view_ports['dview:doctorsmanagement'][f_no - 1])
+        field_name =  select_ports['dview:doctorsmanagement'][f_no - 1]
         
-        data = db.quote_str(input("Enter {field}: ".format(field = view_ports['dview:doctorsmanagement'][f_no - 1])))
+        field_array.append(field_name)
+        
+        data = db.quote_str(input("Enter {field}: ".format(field = select_ports['dview:doctorsmanagement'][f_no - 1])))
         
         data_array.append(data)
         
         another = input("Do you want to enter another field ? [Y/N]")
     
         
-    db.view_entry(table_name, field_array, data_array, view_ports['dview:doctorsmanagement'], table_fields[table_name])  
+    db.view_entry(table_name, field_array, data_array, select_ports['dview:doctorsmanagement'], table_fields['doctorsmanagement'])  
+    
     
 def doctor_range_admin():
+    table_name = 'doctorsmanagement'
+    
     another = "Y"
     field_array = []
     data_array = []
@@ -242,17 +258,17 @@ def doctor_range_admin():
     
     while(another == "Y"):
         print("Enter field: \n")
-        f_no = db.select_make(view_ports['dview:doctorsmanagement'])
+        f_no = db.select_make(select_ports['dview:doctorsmanagement'])
         
-        field_array.append(view_ports['dview:doctorsmanagement'][f_no - 1])
+        field_array.append(select_ports['dview:doctorsmanagement'][f_no - 1])
         
-        data_lesser = db.quote_str(input("{field} > ".format(field = view_ports['dview:doctorsmanagement'][f_no - 1])))
+        data_lesser = db.quote_str(input("{field} > ".format(field = select_ports['dview:doctorsmanagement'][f_no - 1])))
                 
         if len(data_lesser) != 0:
             data_array.append(data_lesser)
             inequality_array.append(" > ")
         
-        data_greater = db.quote_str(input("{field} < ".format(field = view_ports['dview:doctorsmanagement'][f_no - 1])))
+        data_greater = db.quote_str(input("{field} < ".format(field = select_ports['dview:doctorsmanagement'][f_no - 1])))
         if len(data_greater) != 0:
             data_array.append(data_greater)
             inequality_array.append(" < ")
@@ -264,9 +280,36 @@ def doctor_range_admin():
     db.view_range(table_name, field_array, data_array, view_ports['dview:doctorsmanagement'], table_fields[table_name], inequality_array)  
     
     
-
     
-
+def patient_view_admin():
+    table_name = ['patientmanagement']
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another == "Y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports['admin:patientmanagement'])
+        
+        field_name =  select_ports['admin:patientmanagement'][f_no - 1]
+        
+        field_array.append(field_name)
+        
+        data = db.quote_str(input("Enter {field}: ".format(field = select_ports['admin:patientmanagement'][f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+    db.view_entry(table_name, field_array, data_array, view_ports['admin:patientmanagement'], table_fields['patientmanagement'])  
+    print("\nLatest Prescription: ")
+    delete_check = ['prescription', 'patientmanagement', 'doctorsmanagement']
+    combo = [ ["prescription", 'patientmanagement', "patientid"], ["prescription", "doctorsmanagement", "docid"], ["prescription", "diagnostictests", "testid"], ["prescription", "medicine", "medid"]]
+    db.view_entry(delete_check, field_array, data_array, view_ports['admin:last-pres'], table_fields['admin:last-pres'], combo, "prescription.date")
+    
+    delete_check = ['prescription', 'patientmanagement']
+    combo = [ ["prescription", 'patientmanagement', "patientid"], ["prescription", "diagnosticreport", "presid"], ["prescription", "diagnostictests", "testid"], ["diagnosticreport", "doctorsmanagement", "docid"]]
+    db.view_entry(delete_check, field_array, data_array, view_ports['admin:last-rep'], table_fields['admin:last-rep'], combo, "prescription.date")
     
     
 
