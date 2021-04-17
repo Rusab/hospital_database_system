@@ -146,20 +146,48 @@ while(True):
                     p = db.choice_make("Doctor Infromation", "Patient information", "Staff Infromation", "Medical Supplies & Diagnostics", "Room", "Back")
                     
                     if p == 1:
-                        p = db.choice_make("Single Entry", "Multiple Entries")
+                        p = db.choice_make("Search with value", "Search with range", "Back")
                         if p == 1:
                             dsub.doctor_view_admin()
                         elif p == 2:
                             dsub.doctor_range_admin()
                             
                     elif p == 2:
-                        dsub.patient_view_admin()
-                        
+                        while(True):
+                            p = db.choice_make("Patient Information", "Admission & Emergency Infromation", "Prescription", "Diagnostic Reports", "Back")
+                            if p == 1:
+                                p = db.choice_make("Search with value", "Search with range", "Back")
+                                if p == 1:      
+                                    dsub.patient_view_admin()
+                                elif p == 2:
+                                    dsub.patient_range_admin()
                             
-                        
+                            elif p == 2:
+                                p = db.choice_make("Patient: Outdoor", "Patient: Emergency", "Patient : Admission", "Back")
+                                if p == 1:
+                                    p = db.choice_make("Search with value", "Search with range", "Back")
+                                    if p == 1:
+                                        dsub.outdoor_view_admin()
+                                    elif p == 2:
+                                        dsub.outdoor_range_admin()
+                                
+                                elif p == 2:
+                                    p = db.choice_make("Search with value", "Search with range", "Back")
+                                    if p == 1:
+                                        dsub.emergency_view_admin()
+                                    elif p == 2:
+                                        dsub.emergency_range_admin()
+                                
+                                elif p == 3:
+                                    p = db.choice_make("Search with value", "Search with range", "Back")
+                                    if p == 1:
+                                        dsub.admission_view_admin()
+                                    elif p == 2:
+                                        dsub.admission_range_admin() 
+                                else:
+                                    break
                     
-                    
-                    
+                            
             elif x == 5:
                 print("Search for a entry to make changes: ")
                 s_field_name = input("Enter field: ")

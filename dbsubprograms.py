@@ -11,15 +11,26 @@ import dbfunctions as db
 table_fields = {'doctorsmanagement' : ["Doctor id: ", "Doctor Name: ", "Sex: ", "Expertise: ", "Degree: ", "Position: ", "Chamber: ", "Time: ", "Fee: ", "Contact no: ", "Email: "],
                 'patientmanagement': ["Patient ID: ", "Patient Name: ", "Sex: ", 'Age: ', 'Bloodgroup: ', "Medical History: ", "Address: ", "Contact No: ", "Email: "],
                 'admin:last-pres': ["Prescription No: ", "Diagnosis: ", "Date: ", "Time: ", "Prescribed Medicine: ", "Prescribed Tests: ","Prescribed By: ", "Department: "],
-                'admin:last-rep': ["Prescription No: ", "Test Name: ", "Report Summary: ", "Date: ", "Time: ", "Report prepared by: ", "Department: "]}
+                'admin:last-rep': ["Prescription No: ", "Test Name: ", "Report Summary: ", "Date: ", "Time: ", "Report prepared by: ", "Department: "],
+                'admin:outdoor': ["Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Contact No: ", "Visit Date: ", "Visit Time: ", "Duty Doctor: ","Doctor ID: ", "Department: "],
+                'admin:emergency': ["Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Contact No: ", "Visit Date: ", "Visit Time: ", "Duty Doctor: ","Doctor ID: ", "Department: "],
+                'admin:admission': ["Patient ID: ", "Patient Name: ", "Sex: ", "Age: ", "Blood Group: ", "Contact No: ", "Admission Status: ", "Admission Date: ", "Admission Time: ", "Room No: ", "Room Type: ", "Bed No: ", "Release Date: ", "Release Time: ", "Admitted Under: ","Doctor ID: ", "Department of "]}
 
 view_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"],
               'admin:patientmanagement': ["patientid","name", "sex", "age", "bloodgroup", "medicalhistory", "address",  "contactno", "email"],
               'admin:last-pres': ["prescription.presid", "prescription.diagnosis", "prescription.date", "prescription.time", "medicine.brandname", "diagnostictests.name","doctorsmanagement.name", "doctorsmanagement.expertise"],
-              'admin:last-rep': ["prescription.presid", "diagnostictests.name", "diagnosticreport.report", "diagnosticreport.date", "diagnosticreport.time", "doctorsmanagement.name", "doctorsmanagement.expertise"]}
+              'admin:last-rep': ["prescription.presid", "diagnostictests.name", "diagnosticreport.report", "diagnosticreport.date", "diagnosticreport.time", "doctorsmanagement.name", "doctorsmanagement.expertise"],
+              'admin:outdoor': ["patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup", "patientmanagement.contactno", "outdoor.date", "outdoor.time", "doctorsmanagement.name","doctorsmanagement.docid", "doctorsmanagement.expertise"],
+              'admin:emergency': ["patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup", "patientmanagement.contactno", "emergency.date", "emergency.time", "doctorsmanagement.name","doctorsmanagement.docid", "doctorsmanagement.expertise"],
+              'admin:admission': ["patientmanagement.patientid", "patientmanagement.name", "patientmanagement.sex", "patientmanagement.age", "patientmanagement.bloodgroup", "patientmanagement.contactno", "admission.admissionstat", "admission.admissiondate", "admission.admissiontime", "room.roomid", "room.roomtype", "admission.bedno",  "admission.releasedate",  "admission.releasetime", "doctorsmanagement.name","doctorsmanagement.docid", "doctorsmanagement.expertise"]}
 
 select_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"],
-                'admin:patientmanagement': ["patientid", "name", "sex", "bloodgroup", "contactno", "email"]}
+                'drange:doctorsmanagement': ["docid", "name", "fee"],
+                'admin:patientmanagement': ["patientid", "name", "sex", "age", "bloodgroup", "contactno", "email"],
+                'drange:patientmanagement': ["patientid", "name", "age"],
+                'outdoor:admin': ["patientid", "docid", "date"],
+                'emergency:admin': ["patientid", "docid", "date"],
+                'admission:admin': ["patientid", "docid", "admissiondate", "releasedate", "admissionstat"]}
 
 
 insert_scope = {'dview:doctorsmanagement': ["name", "sex", "expertise", "degree", "position", "chamber", "time", "fee", "contactno", "email"], 
@@ -48,9 +59,9 @@ def doctor_entry():
     name = db.quote_str(input("Doctor Name: "))
     sex = db.quote_str(input("Sex: "))
     expertise = db.quote_str(input("Area of expertise: "))
+    degree = db.quote_str(input("Degree: "))
     position = db.quote_str(input("Position: "))
     chamber = db.quote_str(input("Chamber Location: "))
-    degree = db.quote_str(input("Degree: "))
     time = db.quote_str(input("Availble at: "))
     fee = input("Fee: ")
     contactno = db.quote_str( input("Phone number: "))
@@ -92,6 +103,7 @@ def patient_entry():
     db.insert_data(table_name, insert_scope['admin-patient:patientmanagement'], data )     
 
 def emergency_patient():
+    
     patid = input("Enter Patient ID: ")
     docid = input("Enter Doctor ID: ")
     date = db.quote_str(db.date_process(input("Enter Date (DD-MM-YYYY): ")))
@@ -230,7 +242,7 @@ def doctor_view_admin():
     another = "Y"
     field_array = []
     data_array = []
-    while(another == "Y"):
+    while(another.lower() == "y"):
         print("Enter field: \n")
         f_no = db.select_make(select_ports['dview:doctorsmanagement'])
         
@@ -249,35 +261,38 @@ def doctor_view_admin():
     
     
 def doctor_range_admin():
-    table_name = 'doctorsmanagement'
+    table_name = ['doctorsmanagement']
     
     another = "Y"
     field_array = []
     data_array = []
     inequality_array =[]
     
-    while(another == "Y"):
+    while(another.lower() == "y"):
         print("Enter field: \n")
-        f_no = db.select_make(select_ports['dview:doctorsmanagement'])
+        f_no = db.select_make(select_ports['drange:doctorsmanagement'])
         
-        field_array.append(select_ports['dview:doctorsmanagement'][f_no - 1])
         
-        data_lesser = db.quote_str(input("{field} > ".format(field = select_ports['dview:doctorsmanagement'][f_no - 1])))
+        
+        data_lesser = db.quote_str(input("{field} > ".format(field = select_ports['drange:doctorsmanagement'][f_no - 1])))
                 
-        if len(data_lesser) != 0:
+        if data_lesser != '""' :
             data_array.append(data_lesser)
+            field_array.append(select_ports['drange:doctorsmanagement'][f_no - 1])
             inequality_array.append(" > ")
         
-        data_greater = db.quote_str(input("{field} < ".format(field = select_ports['dview:doctorsmanagement'][f_no - 1])))
-        if len(data_greater) != 0:
+        data_greater = db.quote_str(input("{field} < ".format(field = select_ports['drange:doctorsmanagement'][f_no - 1])))
+        
+        if data_greater != '""' :
             data_array.append(data_greater)
+            field_array.append(select_ports['drange:doctorsmanagement'][f_no - 1])
             inequality_array.append(" < ")
     
-        
+       
         another = input("Do you want to enter another field ? [Y/N]")
     
-        
-    db.view_range(table_name, field_array, data_array, view_ports['dview:doctorsmanagement'], table_fields[table_name], inequality_array)  
+       
+    db.view_range(table_name, field_array, data_array, view_ports['dview:doctorsmanagement'], table_fields[table_name[0]], inequality_array)  
     
     
     
@@ -286,7 +301,7 @@ def patient_view_admin():
     another = "Y"
     field_array = []
     data_array = []
-    while(another == "Y"):
+    while(another.lower() == "y"):
         print("Enter field: \n")
         f_no = db.select_make(select_ports['admin:patientmanagement'])
         
@@ -307,11 +322,263 @@ def patient_view_admin():
     combo = [ ["prescription", 'patientmanagement', "patientid"], ["prescription", "doctorsmanagement", "docid"], ["prescription", "diagnostictests", "testid"], ["prescription", "medicine", "medid"]]
     db.view_entry(delete_check, field_array, data_array, view_ports['admin:last-pres'], table_fields['admin:last-pres'], combo, "prescription.date")
     
+    print("\nLatest Report: ")
     delete_check = ['prescription', 'patientmanagement']
     combo = [ ["prescription", 'patientmanagement', "patientid"], ["prescription", "diagnosticreport", "presid"], ["prescription", "diagnostictests", "testid"], ["diagnosticreport", "doctorsmanagement", "docid"]]
     db.view_entry(delete_check, field_array, data_array, view_ports['admin:last-rep'], table_fields['admin:last-rep'], combo, "prescription.date")
     
+def patient_range_admin():
+    table_name = ['patientmanagement']
+    another = "Y"
+    field_array = []
+    data_array = []
+    inequality_array =[]
     
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports['drange:patientmanagement'])
+        
+        field_name =  select_ports['drange:patientmanagement'][f_no - 1]
+        
+        field_array.append(field_name)
+        
+        data_lesser = db.quote_str(input("{field} > ".format(field = field_name)))
+                
+        if data_lesser != '""' :
+            data_array.append(data_lesser)
+            field_array.append(field_name)
+            inequality_array.append(" > ")
+        
+        data_greater = db.quote_str(input("{field} < ".format(field = field_name)))
+        
+        if data_greater != '""' :
+            data_array.append(data_greater)
+            field_array.append(field_name)
+            inequality_array.append(" < ")
+    
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+        
+        
+        
+    db.view_range(table_name, field_array, data_array, view_ports['admin:patientmanagement'], table_fields['patientmanagement'], inequality_array)  
+    
+def outdoor_view_admin():
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports['outdoor:admin'])
+        
+        field_name =  select_ports['outdoor:admin'][f_no - 1]
+        
+        field_array.append(field_name)
+        
+        if field_name == "date":
+           data = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY): ")))
+        
+        else:
+            data = db.quote_str(input("Enter {field}: ".format(field = select_ports['outdoor:admin'][f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+  
+    delete_check = ['outdoor', 'patientmanagement', 'doctorsmanagement']
+    combo = [ ["outdoor", 'patientmanagement', "patientid"], ["outdoor", "doctorsmanagement", "docid"]]
+    db.view_entry(delete_check, field_array, data_array, view_ports['admin:outdoor'], table_fields['admin:outdoor'], combo)
+    
+def outdoor_range_admin():
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    inequality_array =[]
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports['outdoor:admin'])
+        
+        field_name =  select_ports['outdoor:admin'][f_no - 1]
+               
+        
+        if field_name == "date":
+           data_lesser = db.quote_str(db.date_process(input("Date(DD-MM-YYYY) > ")))
+        
+        else:        
+            data_lesser = db.quote_str(input("{field} > ".format(field = field_name)))
+                
+        if data_lesser != '""' :
+            data_array.append(data_lesser)
+            field_array.append(field_name)
+            inequality_array.append(" > ")
+            
+        if field_name == "date":
+         data_greater = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY) < ")))
+        
+        else:      
+            data_greater = db.quote_str(input("{field} < ".format(field = field_name)))
+        
+        if data_greater != '""' :
+            data_array.append(data_greater)
+            field_array.append(field_name)
+            inequality_array.append(" < ")
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+  
+    delete_check = ['outdoor', 'patientmanagement', 'doctorsmanagement']
+    combo = [ ["outdoor", 'patientmanagement', "patientid"], ["outdoor", "doctorsmanagement", "docid"]]
+    db.view_range(delete_check, field_array, data_array, view_ports['admin:outdoor'], table_fields['admin:outdoor'], inequality_array, combo)
+    
+def emergency_view_admin():
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports['emergency:admin'])
+        
+        field_name =  select_ports['emergency:admin'][f_no - 1]
+        
+        field_array.append(field_name)
+        
+        if field_name == "date":
+           data = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY): ")))
+        
+        else:
+            data = db.quote_str(input("Enter {field}: ".format(field = select_ports['emergency:admin'][f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+  
+    delete_check = ['emergency', 'patientmanagement', 'doctorsmanagement']
+    combo = [ ["emergency", 'patientmanagement', "patientid"], ["emergency", "doctorsmanagement", "docid"]]
+    db.view_entry(delete_check, field_array, data_array, view_ports['admin:emergency'], table_fields['admin:emergency'], combo)
+    
+def emergency_range_admin():
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    inequality_array =[]
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports['emergency:admin'])
+        
+        field_name =  select_ports['emergency:admin'][f_no - 1]
+               
+        
+        if field_name == "date":
+           data_lesser = db.quote_str(db.date_process(input("Date(DD-MM-YYYY) > ")))
+        
+        else:        
+            data_lesser = db.quote_str(input("{field} > ".format(field = field_name)))
+                
+        if data_lesser != '""' :
+            data_array.append(data_lesser)
+            field_array.append(field_name)
+            inequality_array.append(" > ")
+            
+        if field_name == "date":
+         data_greater = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY) < ")))
+        
+        else:      
+            data_greater = db.quote_str(input("{field} < ".format(field = field_name)))
+        
+        if data_greater != '""' :
+            data_array.append(data_greater)
+            field_array.append(field_name)
+            inequality_array.append(" < ")
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+  
+    delete_check = ['emergency', 'patientmanagement', 'doctorsmanagement']
+    combo = [ ["emergency", 'patientmanagement', "patientid"], ["emergency", "doctorsmanagement", "docid"]]
+    db.view_range(delete_check, field_array, data_array, view_ports['admin:emergency'], table_fields['admin:emergency'], inequality_array, combo)
+    
+def admission_view_admin():
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports['admission:admin'])
+        
+        field_name =  select_ports['admission:admin'][f_no - 1]
+        
+        field_array.append(field_name)
+        
+        if field_name == "admissiondate" or field_name == "releasedate":
+           data = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY): ")))
+        
+        else:
+            data = db.quote_str(input("Enter {field}: ".format(field = select_ports['admission:admin'][f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+  
+    delete_check = ['admission', 'patientmanagement', 'doctorsmanagement', 'room']
+    combo = [ ["admission", 'patientmanagement', "patientid"], ["admission", "doctorsmanagement", "docid"], ["admission", "room", "roomid"]]
+    db.view_entry(delete_check, field_array, data_array, view_ports['admin:admission'], table_fields['admin:admission'], combo)
+    
+def admission_range_admin():
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    inequality_array =[]
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports['admission:admin'])
+        
+        field_name =  select_ports['admission:admin'][f_no - 1]
+               
+        
+        if field_name == "admissiondate" or field_name == "releasedate":
+           data_lesser = db.quote_str(db.date_process(input("Date(DD-MM-YYYY) > ")))
+        
+        else:        
+            data_lesser = db.quote_str(input("{field} > ".format(field = field_name)))
+                
+        if data_lesser != '""' :
+            data_array.append(data_lesser)
+            field_array.append(field_name)
+            inequality_array.append(" > ")
+            
+        if field_name == "admissiondate" or field_name == "releasedate":
+         data_greater = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY) < ")))
+        
+        else:      
+            data_greater = db.quote_str(input("{field} < ".format(field = field_name)))
+        
+        if data_greater != '""' :
+            data_array.append(data_greater)
+            field_array.append(field_name)
+            inequality_array.append(" < ")
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+  
+    delete_check = ['admission', 'patientmanagement', 'doctorsmanagement']
+    combo = [ ["admission", 'patientmanagement', "patientid"], ["admission", "doctorsmanagement", "docid"], ["admission", "room", "roomid"]]
+    db.view_range(delete_check, field_array, data_array, view_ports['admin:admission'], table_fields['admin:admission'], inequality_array, combo)
+
 
 
     

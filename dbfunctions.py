@@ -10,7 +10,7 @@ def connect_db(db_name):
     try:
         con = MySQLdb.connect("localhost","root","", db_name)
         cur = con.cursor()
-        print("Connected") 
+
         
         return con, cur
         
@@ -146,52 +146,73 @@ def view_entry(table_name, field_name, data, view_port, field_names, table_combo
     
     try:
         cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))
-        
+         
     
         row = cur.fetchone() 
-        
+        cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))     
         data =cur.fetchall() 
         
+
         #check if one or more columns have been selected
-        if len(data) > len(row):    
+        if len(data) <= len(row):    
             for row in data:
-                for col in row:
-                    print(col)
+                for (entry, field) in zip(row, field_names):
+                    print(field, entry)
+                print("\n")
+        
         
         else:
             for (entry, field) in zip(row, field_names):
                 print(field, entry)
         
     except:
-        print("Couldn't find entry")
+        print("No Entries Found")
     
         
     disconnect_db(con, cur)
     
 
     
-def view_range(table_name, field_name, data_range, view_port, field_names, inequality):    
+def view_range(table_name, field_name, data_range, view_port, field_names, inequality, table_combo = [], order = ""):    
     con, cur = connect_db("HospitalDatabase")
     
     
     
     keyword = ""
     for (name, dat, inequal) in zip(field_name, data_range, inequality):
-        keyword = keyword + name + inequal + dat + " AND "
+        keyword = keyword + table_name[0] +"."+name + inequal + dat + " AND "
+   
+
+    from_table = table_name[0]
+    
+    if len(table_name) > 1:
+        for combo in table_combo:
+            from_table +=  " LEFT JOIN " + combo[1] + " ON " + combo[0]+"."+combo[2] + " = " + combo[1]+"."+combo[2] 
+        
+    
+    first_table = True
+    for table in table_name:
+        if(not first_table):
+            keyword += " AND "
+        keyword += table + "." + "is_deleted = 0"
+        first_table = False
+    
+    if len(order):
+        keyword += " ORDER BY " + order + " DESC"
         
         
     
     #string of columns to select
     cols = comma_join(view_port)
     
-    print("SELECT {cols} from {table} WHERE {keyword} is_deleted = 0;".format(cols = cols, table = table_name, keyword = keyword))
+    # print("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))
 
     try:
-        cur.execute("SELECT {cols} from {table} WHERE {keyword} is_deleted = 0;".format(cols = cols, table = table_name, keyword = keyword))
-        
+        cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))
+         
     
         row = cur.fetchone() 
-        cur.execute("SELECT {cols} from {table} WHERE {keyword} is_deleted = 0;".format(cols = cols, table = table_name, keyword = keyword))     
+        cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))     
         data =cur.fetchall() 
         
 
