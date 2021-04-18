@@ -93,23 +93,91 @@ def display_all(table_name):
     
     
 # def display_multiple()
-    
-def check_entry(table_name, field_name, data):    
+def check_entry(table_name, field_name, data, view_port, field_names, table_combo = [], order = "", jointype = "LEFT JOIN"):    
     con, cur = connect_db("HospitalDatabase")
     
-    try:
-        cur.execute("SELECT * from {table} WHERE {field} = {data};".format(table = table_name, field = field_name, data = data))
-        data = cur.fetchall()
+    keyword = ""
+    for (name, dat) in zip(field_name, data):
+        keyword = keyword + table_name[0] +"."+name + " = " + dat + " AND "
+    
+    from_table = table_name[0]
+    
+    if len(table_name) > 1:
+        for combo in table_combo:
+            from_table +=  " " + jointype +" " + combo[1] + " ON " + combo[0]+"."+combo[2] + " = " + combo[1]+"."+combo[2] 
         
-        if data:
-            return True
+    
+    first_table = True
+    for table in table_name:
+        if(not first_table):
+            keyword += " AND "
+        keyword += table + "." + "is_deleted = 0"
+        first_table = False
+    
+    if len(order):
+        keyword += " ORDER BY " + order + " DESC LIMIT 1"
+
+        
+    
+    #string of columns to select
+    cols = comma_join(view_port)
+    
+    # print("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))
+    
+    try:
+        cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))
+         
+    
+        row = cur.fetchone() 
+        cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))     
+        data =cur.fetchall() 
+        
+        selector_array = []
+        i = 1
+        #check if one or more columns have been selected
+        if len(data) <= len(row):    
+            for row in data:
+                select = []
+                print("Entry no. ", i)
+                for (entry, field, coln) in zip(row, field_names, field_name):
+                    select.append(coln +"."+table_name[0] + " = " + entry)
+                    print(field, entry)
+                selector_array.append(select)
+                i += 1
+                    
+                print("\n")
+        
+        
         else:
-            return False
+            for (entry, field) in zip(row, field_names):
+                print(field, entry)
+        
     except:
-        return False
+        print("No Entries Found")
     
         
-    disconnect_db(con, cur)
+    disconnect_db(con, cur)   
+
+    
+
+
+
+# def check_entry(table_name, field_name, data):    
+#     con, cur = connect_db("HospitalDatabase")
+    
+#     try:
+#         cur.execute("SELECT * from {table} WHERE {field} = {data};".format(table = table_name, field = field_name, data = data))
+#         data = cur.fetchall()
+        
+#         if data:
+#             return True
+#         else:
+#             return False
+#     except:
+#         return False
+    
+        
+#     disconnect_db(con, cur)
 
 
     
@@ -338,6 +406,9 @@ def update_data(table_name, s_field_name, s_data, u_field_name, u_data):
    
     disconnect_db(con, cur)
     
+
+
+
 
 def soft_delete(table_name, field_name, data):
     update_data(table_name, field_name, data, "is_deleted", 1)
