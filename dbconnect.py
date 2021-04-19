@@ -318,31 +318,211 @@ while(True):
                             dsub.generic_range_singletable(dsub.select_ports['room'], dsub.view_ports['room'], dsub.table_fields['room'], table)
                        elif p == 3:
                             db.view_all(['room'], dsub.view_ports['room'], dsub.table_fields['room'])
+                            
+                    else:
+                        break
                         
                                 
                             
                     
-                            
+            #UPDATE                
             elif x == 5:
-                print("Search for a entry to make changes: ")
-                s_field_name = input("Enter field: ")
-                s_data = db.quote_str(input("Enter {field}: ".format(field = s_field_name))) 
-                
-                if db.check_entry(table_name, s_field_name, s_data):
-                    rep = 'Y'
-                
-                    while(rep.lower() == 'y'):    
+                while(True):
+                    p = db.choice_make("Doctor Infromation", "Patient information", "Staff Infromation", "Medical Supplies & Diagnostics", "Room", "Back")
+                    if p == 1:
+                        p = db.choice_make("Doctor Infromation", "Duty Schedule", "Back")
+                        if p == 1:
+                            p = db.choice_make("Search with value", "View All", "Back")
+                            table = 'doctorsmanagement'
+                            if p == 1:
+                                dsub.generic_update_singletable(dsub.select_ports['dview:doctorsmanagement'], dsub.view_ports['dview:doctorsmanagement'], dsub.table_fields['doctorsmanagement'], table)
+                            elif p == 2:
+                                db.view_all(['doctorsmanagement'], dsub.view_ports['dview:doctorsmanagement'], dsub.table_fields['doctorsmanagement'])
+                                
+                        elif p == 2:
+                            p = db.choice_make("Search with value", "Search with range", "View all", "Back")
+                            delete_check = ['roomduty', 'doctorsmanagement', 'room']
+                            combo = [ ["roomduty", 'doctorsmanagement', "docid"], ["roomduty", "room", "roomid"]]
+                            if p == 1:
+                                dsub.generic_view_value(dsub.select_ports['admin:docduty'], dsub.view_ports['admin:docduty'], dsub.table_fields['admin:docduty'], delete_check, combo, "date", "date") 
+                            elif p == 2:
+                                table = 'roomduty'
+                                dsub.generic_range_singletable(dsub.select_ports['admin:docduty'], dsub.view_ports['admin:docduty'], dsub.table_fields['admin:docduty'], table)
+                            elif p == 3:
+                                db.view_all(delete_check, dsub.view_ports['admin:docduty'], dsub.table_fields['admin:docduty'], combo)
+                            
+                    elif p == 2:
+                        while(True):
+                            p = db.choice_make("Patient Information", "Admission & Emergency Infromation", "Prescription", "Diagnostic Reports", "Back")
+                            if p == 1:
+                                p = db.choice_make("Search with value", "Search with range", "View All", "Back")
+                                if p == 1:      
+                                    dsub.patient_view_admin()
+                                elif p == 2:
+                                    dsub.patient_range_admin()
+                                elif p == 3:
+                                    db.view_all(['patientmanagement'], dsub.view_ports['admin:patientmanagement'], dsub.table_fields['patientmanagement'])
                         
-                        print("Enter the changes you want to make: ")
-                        u_field_name = input("Enter field: ")
-                        u_data = db.quote_str(input("Enter {field}: ".format(field = u_field_name)))      
+                            
+                            elif p == 2:
+                                p = db.choice_make("Patient: Outdoor", "Patient: Emergency", "Patient : Admission", "Back")
+                                if p == 1:
+                                    p = db.choice_make("Search with value", "Search with range", "View All", "Back")
+                                    delete_check = ['outdoor', 'patientmanagement', 'doctorsmanagement']
+                                    combo = [ ["outdoor", 'patientmanagement', "patientid"], ["outdoor", "doctorsmanagement", "docid"]]
+                                    
+                                    if p == 1:
+                                        dsub.generic_view_value(dsub.select_ports['outdoor:admin'], dsub.view_ports['admin:outdoor'], dsub.table_fields['admin:outdoor'], delete_check, combo, "date", "date")
+                                        
+                                    elif p == 2:
+                                        dsub.generic_view_range(dsub.select_ports['outdoor:admin'], dsub.view_ports['admin:outdoor'], dsub.table_fields['admin:outdoor'], delete_check, combo, "date", "date")
+                                        
+                                    elif p == 3:
+                                        db.view_all(delete_check, dsub.view_ports['outdoor:admin'], dsub.table_fields['outdoor:admin'], combo)
+                                
+                                elif p == 2:
+                                    p = db.choice_make("Search with value", "Search with range", "View All", "Back")
+                                    delete_check = ['emergency', 'patientmanagement', 'doctorsmanagement']
+                                    combo = [ ["emergency", 'patientmanagement', "patientid"], ["emergency", "doctorsmanagement", "docid"]]
+                                    
+                                    if p == 1:
+                                        dsub.generic_view_value(dsub.select_ports['emergency:admin'], dsub.view_ports['admin:emergency'], dsub.table_fields['admin:emergency'], delete_check, combo, "date", "date")
+                                        
+                                    elif p == 2:
+                                        dsub.generic_view_range(dsub.select_ports['emergency:admin'], dsub.view_ports['admin:emergency'], dsub.table_fields['admin:emergency'], delete_check, combo, "date", "date")
+                                    elif p == 3:
+                                        db.view_all(delete_check, dsub.view_ports['emergency:admin'], dsub.table_fields['emergency:admin'], combo)
+                                
+                                elif p == 3:
+                                    p = db.choice_make("Search with value", "Search with range", "View All", "Back")
+                                    delete_check = ['admission', 'patientmanagement', 'doctorsmanagement']
+                                    combo = [ ["admission", 'patientmanagement', "patientid"], ["admission", "doctorsmanagement", "docid"], ["admission", "room", "roomid"]]
+                                    if p == 1:
+                                        
+                                        dsub.generic_view_value(dsub.select_ports['admission:admin'], dsub.view_ports['admin:admission'], dsub.table_fields['admin:admission'], delete_check, combo, "admissiondate", "releasedate")
+                                    elif p == 2:
+                                        dsub.generic_view_range(dsub.select_ports['admission:admin'], dsub.view_ports['admin:admission'], dsub.table_fields['admin:admission'], delete_check, combo, "admissiondate", "releasedate")
+                                    elif p == 3:
+                                        db.view_all(delete_check, dsub.view_ports['admission:admin'], dsub.table_fields['admission:admin'], combo)
+                                    
+                            elif p == 3:
+                                p = db.choice_make("Search with value", "Search with range", "View All", "Back")
+                                delete_check = ['prescription', 'patientmanagement', 'doctorsmanagement']
+                                combo = [ ["prescription", 'patientmanagement', "patientid"], ["prescription", "doctorsmanagement", "docid"], ["prescription", "medicine", "medid"], ["prescription", "diagnostictests", "testid"]]
+                               
+                                if p == 1:
+                                    dsub.generic_view_value(dsub.select_ports['admin:prescription'], dsub.view_ports['admin:prescription'], dsub.table_fields['admin:prescription'], delete_check, combo, "date", "date") 
+                                
+                                elif p == 2:
+                                    dsub.generic_view_range(dsub.select_ports['admin:prescription'], dsub.view_ports['admin:prescription'], dsub.table_fields['admin:prescription'], delete_check, combo, "date", "date")
+                                elif p == 3:
+                                    db.view_all(delete_check, dsub.view_ports['admin:prescription'], dsub.table_fields['admin:prescription'], combo)
+                            
+                            elif p == 4:
+                                p = db.choice_make("Search with value", "Search with range", "View All", "Back")
+                                delete_check = ['prescription', 'patientmanagement', 'diagnosticreport']
+                                combo =  [ ["prescription", "diagnosticreport", "presid"], ["prescription", 'patientmanagement', "patientid"],  ["prescription", "diagnostictests", "testid"], ["diagnosticreport", "doctorsmanagement", "docid"]]
+                               
+                                if p == 1:
+                                    dsub.generic_view_value(dsub.select_ports['admin:report'], dsub.view_ports['admin:report'], dsub.table_fields['admin:report'], delete_check, combo, "date", "date") 
+                                
+                                elif p == 2:
+                                    dsub.generic_view_range(dsub.select_ports['admin:report'], dsub.view_ports['admin:report'], dsub.table_fields['admin:report'], delete_check, combo, "date", "date")   
+                                
+                                elif p == 3:
+                                    db.view_all(delete_check, dsub.view_ports['admin:report'], dsub.table_fields['admin:report'], combo)
+
+                            else:
+                                break
+                            
+                    elif p == 3:
+                        while(True):
+                             p = db.choice_make("Staff Information", "Duty Schedule", "Back")
+                             if p == 1:
+                                 p = db.choice_make("Search with value", "Search with range", "View All", "Back")
+                                 if p == 1:
+                                     table = 'staffmanagement'
+                                     dsub.generic_view_singletable(dsub.select_ports['admin:staffmanagement'], dsub.view_ports['admin:staffmanagement'], dsub.table_fields['admin:staffmanagement'], table)
+                                 elif p == 2:
+                                     table = 'staffmanagement'
+                                     dsub.generic_range_singletable(dsub.select_ports['admin:staffmanagement'], dsub.view_ports['admin:staffmanagement'], dsub.table_fields['admin:staffmanagement'], table)
+                                 elif p == 3:
+                                     db.view_all(['staffmanagement'], dsub.view_ports['admin:staffmanagement'], dsub.table_fields['admin:staffmanagement'])
+                                     
+                                     
+                             elif p == 2:
+                                 p = db.choice_make("Search with value", "Search with range", "View All", "Back")
+                                 delete_check = ['roomduty', 'staffmanagement', 'room']
+                                 combo = [ ["roomduty", 'staffmanagement', "staffid"], ["roomduty", "room", "roomid"]]
+                                 if p == 1:
+                                     dsub.generic_view_value(dsub.select_ports['admin:staffduty'], dsub.view_ports['admin:staffduty'], dsub.table_fields['admin:staffduty'], delete_check, combo, "date", "date") 
+                                 elif p == 2:
+                                     dsub.generic_view_range(dsub.select_ports['admin:staffduty'], dsub.view_ports['admin:staffduty'], dsub.table_fields['admin:staffduty'], delete_check, combo, "date", "date") 
+                                 elif p == 3:
+                                     db.view_all(delete_check, dsub.view_ports['admin:staffduty'], dsub.table_fields['admin:staffduty'], combo)
+                             
+                    elif p == 4:
+                       p = db.choice_make("Medicines", "Medical Equipments", "Diagnostic Tests", "Back")
+                       if p == 1:
+                           p = db.choice_make("Search with value", "Search with range", "View All", "Back")  
+                           table = 'medicine'
+                           if p == 1:  
+                                dsub.generic_view_singletable(dsub.select_ports['medicine'], dsub.view_ports['medicine'], dsub.table_fields['medicine'], table)
+                           elif p == 2:
+                                dsub.generic_range_singletable(dsub.select_ports['medicine'], dsub.view_ports['medicine'], dsub.table_fields['medicine'], table)
+                           elif p == 3:
+                                db.view_all(['medicine'], dsub.view_ports['medicine'], dsub.table_fields['medicine'])
+                                
+                       elif p == 2:
+                           p = db.choice_make("Search with value", "Search with range", "View All", "Back")  
+                           table = 'medequipment'
+                           if p == 1:  
+                                dsub.generic_view_singletable(dsub.select_ports['medequipment'], dsub.view_ports['medequipment'], dsub.table_fields['medequipment'], table)
+                           elif p == 2:
+                                dsub.generic_range_singletable(dsub.select_ports['medequipment'], dsub.view_ports['medequipment'], dsub.table_fields['medequipment'], table)
+                           elif p == 3:
+                                db.view_all(['medequipment'], dsub.view_ports['medequipment'], dsub.table_fields['medequipment'])
                         
-                        db.update_data(table_name, s_field_name, s_data, u_field_name, u_data)
-                        
-                        rep = input("Do you want to update more fields ? [Y/N]")
+                       elif p == 3:
+                           p = db.choice_make("Search with value", "Search with range", "View All", "Back")  
+                           table = 'diagnostictests'
+                           if p == 1:  
+                                dsub.generic_view_singletable(dsub.select_ports['diagnostictests'], dsub.view_ports['diagnostictests'], dsub.table_fields['diagnostictests'], table)
+                           elif p == 2:
+                                dsub.generic_range_singletable(dsub.select_ports['diagnostictests'], dsub.view_ports['diagnostictests'], dsub.table_fields['diagnostictests'], table)
+                           elif p == 3:
+                                db.view_all(['diagnostictests'], dsub.view_ports['diagnostictests'], dsub.table_fields['diagnostictests'])
+                                
+                    elif p == 5:
+                       p = db.choice_make("Search with value", "Search with range", "View All", "Back")  
+                       table = 'room'
+                       if p == 1:  
+                            dsub.generic_view_singletable(dsub.select_ports['room'], dsub.view_ports['room'], dsub.table_fields['room'], table)
+                       elif p == 2:
+                            dsub.generic_range_singletable(dsub.select_ports['room'], dsub.view_ports['room'], dsub.table_fields['room'], table)
+                       elif p == 3:
+                            db.view_all(['room'], dsub.view_ports['room'], dsub.table_fields['room'])
+                # print("Search for a entry to make changes: ")
+                # s_field_name = input("Enter field: ")
+                # s_data = db.quote_str(input("Enter {field}: ".format(field = s_field_name))) 
                 
-                else:
-                    print("No such entry found.")
+                
+                
+                # if db.check_entry(table_name, s_field_name, s_data):
+                #     rep = 'Y'
+                
+                #     while(rep.lower() == 'y'):    
+                        
+                #         print("Enter the changes you want to make: ")
+                #         u_field_name = input("Enter field: ")
+                #         u_data = db.quote_str(input("Enter {field}: ".format(field = u_field_name)))      
+                        
+                #         db.update_data(table_name, s_field_name, s_data, u_field_name, u_data)
+                        
+                #         rep = input("Do you want to update more fields ? [Y/N]")
+                
+                # else:
+                #     print("No such entry found.")
             
             else: 
                 break

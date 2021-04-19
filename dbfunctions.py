@@ -121,43 +121,86 @@ def check_entry(table_name, field_name, data, view_port, field_names, table_comb
     
     #string of columns to select
     cols = comma_join(view_port)
+    selector_array = []
+    i = 0
     
     # print("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))
     
     try:
         cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))
          
-    
+        
         row = cur.fetchone() 
         cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))     
         data =cur.fetchall() 
         
-        selector_array = []
-        i = 1
+        # disconnect_db(con, cur)
+        disconnect_db(con, cur)
+        
+        # print(data)
+        
         #check if one or more columns have been selected
         if len(data) <= len(row):    
             for row in data:
+                i += 1
                 select = []
                 print("Entry no. ", i)
-                for (entry, field, coln) in zip(row, field_names, field_name):
-                    select.append(coln +"."+table_name[0] + " = " + entry)
+                for (entry, field, coln) in zip(row, field_names, view_port):
+                    
+                    entry = quote_str(str(entry))
+                    if len(table_combo) == 0 or (table_name[0] in field):
+                        select.append(""+ table_name[0] +"."+ coln + " = " + entry)
                     print(field, entry)
                 selector_array.append(select)
-                i += 1
+                
                     
                 print("\n")
         
         
         else:
-            for (entry, field) in zip(row, field_names):
+            select = []
+            i += 1
+            print("Entry no. ", i)
+            for (entry, field, coln) in zip(row, field_names, view_port):
+               
+                entry = quote_str(str(entry))
+                if len(table_combo) == 0 or (table_name[0] in field):
+                    select.append("" + table_name[0] +"."+ coln + " = " + entry)
                 print(field, entry)
+            selector_array.append(select)        
+
         
     except:
         print("No Entries Found")
+        return
+        
+    
+
+ 
+    if i > 1:
+        x  = int(input("Select an output: "))
+    else:
+        x = 1
+        
+    
+    selection = selector_array[x-1]
+    # print(selection)
+    keyword = ""
+    
+    first_cell = True
+    for cell in selection:
+        if(not first_cell):
+            keyword += " AND "
+        keyword += cell 
+        first_cell = False
+    
+    # print(keyword)
+    
+    return keyword
+
+    
     
         
-    disconnect_db(con, cur)   
-
     
 
 
@@ -393,11 +436,22 @@ def delete_data(table_name, field_name, data):
 
 
 
-def update_data(table_name, s_field_name, s_data, u_field_name, u_data):
+def update_data(table_name, where, field_name, data):
     con, cur = connect_db("HospitalDatabase")  
     
+
+    
+    keyword = ""
+    first = True
+    for (name, dat) in zip(field_name, data):
+        if(not first):
+            keyword += ", "
+        keyword = keyword + table_name[0] +"."+name + " = " + dat 
+        first = False
+    
+    print("UPDATE {table} SET {keyword} WHERE {where};".format(table = table_name[0], keyword = keyword, where = where))
     try:
-        cur.execute("UPDATE {table} SET {u_field} = {u_data} WHERE {s_field} = {s_data}".format(table = table_name, s_field = s_field_name, s_data = s_data, u_field = u_field_name, u_data = u_data))
+        cur.execute("UPDATE {table} SET {keyword} WHERE {where};".format(table = table_name[0], keyword = keyword, where = where))
         con.commit()
         print("Updated")
         
@@ -410,5 +464,5 @@ def update_data(table_name, s_field_name, s_data, u_field_name, u_data):
 
 
 
-def soft_delete(table_name, field_name, data):
-    update_data(table_name, field_name, data, "is_deleted", 1)
+# def soft_delete(table_name, field_name, data):
+#     update_data(table_name, field_name, data, "is_deleted", 1)

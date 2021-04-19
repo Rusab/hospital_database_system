@@ -701,7 +701,7 @@ def generic_view_singletable(select_ports, view_ports, table_fields, table):
         another = input("Do you want to enter another field ? [Y/N]")
     
         
-    db.view_entry(table_name, field_array, data_array ,select_ports, table_fields)  
+    db.view_entry(table_name, field_array, data_array , view_ports, table_fields)  
 
 def generic_range_singletable(select_ports, view_ports, table_fields, table):
     table_name = [table]
@@ -744,6 +744,95 @@ def generic_range_singletable(select_ports, view_ports, table_fields, table):
     
        
     db.view_range(table_name, field_array, data_array, view_ports, table_fields, inequality_array)  
+    
+
+def generic_update_value(select_ports, view_ports, table_fields, delete_check, combo, datefield1="", datefield2="", jointype = "LEFT JOIN"):
+
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports)
+        
+        field_name =  select_ports[f_no - 1]
+        
+        field_array.append(field_name)
+        
+        if field_name == datefield1 or field_name == datefield2:
+           data = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY): ")))
+        
+        else:
+            data = db.quote_str(input("Enter {field}: ".format(field = select_ports[f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+        
+    db.check_entry(delete_check, field_array, data_array, view_ports, table_fields, combo)
+    
+    
+
+def generic_update_singletable(select_ports, view_ports, table_fields, table):
+    table_name = [table]
+    
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another.lower() == "y"):
+        print("Enter field: \n")
+        f_no = db.select_make(select_ports)
+        
+        field_name =  select_ports[f_no - 1]
+        
+        field_array.append(field_name)
+        
+        if field_name == "date":
+           data = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY): ")))
+        
+        else:
+            data = db.quote_str(input("Enter {field}: ".format(field = select_ports[f_no - 1])))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+        
+    sel = db.check_entry(table_name, field_array, data_array ,select_ports, table_fields)
+    
+    print(sel)
+    
+    print("Select the field you want to update? ")
+    
+    select_fields = select_ports
+    another = "Y"
+    field_array = []
+    data_array = []
+    while(another.lower() == "y" or len(select_fields) == 0):
+        print("Enter field: \n")
+        f_no = db.select_make(select_fields)
+        
+        field_name =  select_fields[f_no - 1]
+        
+        select_fields.pop(f_no - 1)
+        
+        field_array.append(field_name)
+        
+        if field_name == "date":
+           data = db.quote_str(db.date_process(input("Enter Date(DD-MM-YYYY): ")))
+        
+        else:
+            data = db.quote_str(input("Enter {field}: ".format(field = field_name)))
+        
+        data_array.append(data)
+        
+        another = input("Do you want to enter another field ? [Y/N]")
+    
+    db.update_data(table_name, sel, field_array, data_array)
+    
+    
+    
+    
 
 
     
