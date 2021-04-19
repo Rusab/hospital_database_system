@@ -494,7 +494,7 @@ while(True):
             if x == 1:
                 while(True):
                     print("\n**** View Infromation ****\n")
-                    p = db.choice_make("Doctor Infromation", "Patient information", "Staff Infromation", "Medical Supplies & Diagnostics", "Room", "Back")
+                    p = db.choice_make("Doctor Infromation", "Patient information", "Medical Supplies & Diagnostics", "Room", "Back")
                     if p == 1:
                         p = db.choice_make("Doctor Infromation", "Duty Schedule", "Back")
                         if p == 1:
@@ -651,23 +651,24 @@ while(True):
                             
                     
             #UPDATE                
-            elif x == 3:
+            elif x == 2:
                 while(True):
                     print("\n**** Update Infromation ****\n")
                     p = db.choice_make("Patient information", "Back")
                    
                             
                     if p == 1:
-                        while(True):
-                            p = db.choice_make("Patient Information", "Admission & Emergency Infromation", "Back")
-                            if p == 1:
-                                table = 'patientmanagement'
-                                dsub.generic_update_singletable(dsub.select_ports['admin:patientmanagement'], dsub.view_ports['admin:patientmanagement'], dsub.table_fields['patientmanagement'], table, update_ports = dsub.update_ports['patsel:patientmanagement'])
+
+                        table = 'patientmanagement'
+                        dsub.generic_update_singletable(dsub.select_ports['admin:patientmanagement'], dsub.view_ports['admin:patientmanagement'], dsub.table_fields['patientmanagement'], table, update_ports = dsub.update_ports['patsel:patientmanagement'])
                                                        
 
-                            else:
-                                break
+                    else:
+                        break
                             
+                            
+            else:
+                break
                   
           
         

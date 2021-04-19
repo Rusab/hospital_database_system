@@ -54,7 +54,7 @@ select_ports = {'dview:doctorsmanagement': ["docid", "name", "sex", "expertise",
                 'admin:staffmanagement': ["staffid", "name", "sex", "age", "position", "contactno", "email", "salary"],
                 'admin:staffduty': ["staffid", "roomid", "date", "time"],
                 'admin:docduty': ["docid", "roomid", "date", "time"],
-                'medicine':["medid", "brandname", "genericname", "manufecturer", "stock"],
+                'medicine':["medid", "brandname", "genericname", "literature", "manufecturer", "stock"],
                 'medequipment': ["equipid", "name", "stock"],
                 'diagnostictests': ["testid", "name", "roomid"],
                 'room': ["roomid", "roomtype", "bedcount"]}
@@ -837,7 +837,7 @@ def generic_update_value(select_ports, view_ports, table_fields, delete_check, c
         db.update_data(table_name, sel, field_array, data_array) 
     
 
-def generic_update_singletable(select_ports, view_ports, table_fields, table, update_ports = select_ports):
+def generic_update_singletable(select_ports, view_ports, table_fields, table, update_ports = []):
     table_name = [table]
     
     another = "Y"
@@ -868,7 +868,11 @@ def generic_update_singletable(select_ports, view_ports, table_fields, table, up
     if(sel):
         print("Select the field you want to update? ")
         
-        select_fields = update_ports.copy()
+        if update_ports:
+            select_fields = update_ports.copy()
+        
+        else:
+            select_fields = select_ports.copy()
     
         primary_key_check = ['patientmanagement', 'doctorsmanagement', 'medicine', 'medequipment', 'staffmanagement', 'diagnostictests', 'room']
         
