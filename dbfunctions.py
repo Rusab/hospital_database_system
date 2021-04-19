@@ -138,19 +138,22 @@ def check_entry(table_name, field_name, data, view_port, field_names, table_comb
         disconnect_db(con, cur)
         
         # print(data)
-        
-        #check if one or more columns have been selected
+    #check if one or more columns have been selected
         if len(data) <= len(row):    
             for row in data:
                 i += 1
                 select = []
                 print("Entry no. ", i)
+                print("---------------")
                 for (entry, field, coln) in zip(row, field_names, view_port):
-                    
-                    entry = quote_str(str(entry))
-                    if len(table_combo) == 0 or (table_name[0] in field):
-                        select.append(""+ table_name[0] +"."+ coln + " = " + entry)
                     print(field, entry)
+                    entry = quote_str(str(entry))
+               
+                    if len(table_combo) == 0 :
+                        select.append(""+ table_name[0] +"."+ coln + " = " + entry)
+                    elif table_name[0] in coln:
+                        select.append("" + coln + " = " + entry)
+                    
                 selector_array.append(select)
                 
                     
@@ -161,24 +164,29 @@ def check_entry(table_name, field_name, data, view_port, field_names, table_comb
             select = []
             i += 1
             print("Entry no. ", i)
+            print("---------------")
             for (entry, field, coln) in zip(row, field_names, view_port):
-               
-                entry = quote_str(str(entry))
-                if len(table_combo) == 0 or (table_name[0] in field):
-                    select.append("" + table_name[0] +"."+ coln + " = " + entry)
                 print(field, entry)
-            selector_array.append(select)        
+                entry = quote_str(str(entry))
+                
+                if len(table_combo) == 0:
+                    select.append("" + table_name[0] +"."+ coln + " = " + entry)
+                elif table_name[0] in coln:
+                    select.append("" + coln + " = " + entry)
+                
+            selector_array.append(select)         
 
         
     except:
         print("No Entries Found")
         return
         
-    
+   
+
 
  
     if i > 1:
-        x  = int(input("Select an output: "))
+        x  = int(input("\nMultiple results found !!! \nSelect an entry: "))
     else:
         x = 1
         
@@ -195,6 +203,7 @@ def check_entry(table_name, field_name, data, view_port, field_names, table_comb
         first_cell = False
     
     # print(keyword)
+    
     
     return keyword
 
@@ -263,7 +272,7 @@ def view_entry(table_name, field_name, data, view_port, field_names, table_combo
         cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))     
         data =cur.fetchall() 
         
-
+        print("\nShowing Results:\n--------------------")
         #check if one or more columns have been selected
         if len(data) <= len(row):    
             for row in data:
@@ -326,7 +335,7 @@ def view_range(table_name, field_name, data_range, view_port, field_names, inequ
         cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))     
         data =cur.fetchall() 
         
-
+        print("\nShowing Results:\n--------------------")
         #check if one or more columns have been selected
         if len(data) <= len(row):    
             for row in data:
@@ -386,7 +395,7 @@ def view_all(table_name, view_port, field_names, table_combo = [], order = "", j
         cur.execute("SELECT {cols} from {table} WHERE {keyword};".format(cols = cols, table = from_table, keyword = keyword))     
         data =cur.fetchall() 
         
-
+        print("\nShowing Results:\n--------------------")
         #check if one or more columns have been selected
         if len(data) <= len(row):    
             for row in data:
@@ -413,21 +422,27 @@ def insert_data(table_name, fields_inserted, field_data):
     fields = comma_join(fields_inserted)
     data = comma_join(field_data)
     
-    cur.execute("INSERT INTO {table} ({fields}) VALUES ({data});".format(table = table_name, fields = fields, data = data))
-    con.commit()
-    
-
+    try:
+        cur.execute("INSERT INTO {table} ({fields}) VALUES ({data});".format(table = table_name, fields = fields, data = data))
+        con.commit()
+        
+        print("Entry Added Succesfully")
+        
+    except:
+        print("Failed to add entry")
+        
     disconnect_db(con, cur)
     
     
     
-def delete_data(table_name, field_name, data):
+def delete_data(table_name, where):
     con, cur = connect_db("HospitalDatabase")
     
     
     try:
-        cur.execute("DELETE FROM {table} WHERE {field} = {data}".format(table = table_name, field = field_name, data=  data))       
+        cur.execute("DELETE FROM {table} WHERE {where}".format(table = table_name[0], where = where))       
         con.commit()
+        print("Entry Successfully Deleted")
         
     except:
         print("Data not found")
@@ -449,7 +464,7 @@ def update_data(table_name, where, field_name, data):
         keyword = keyword + table_name[0] +"."+name + " = " + dat 
         first = False
     
-    print("UPDATE {table} SET {keyword} WHERE {where};".format(table = table_name[0], keyword = keyword, where = where))
+    # print("UPDATE {table} SET {keyword} WHERE {where};".format(table = table_name[0], keyword = keyword, where = where))
     try:
         cur.execute("UPDATE {table} SET {keyword} WHERE {where};".format(table = table_name[0], keyword = keyword, where = where))
         con.commit()
